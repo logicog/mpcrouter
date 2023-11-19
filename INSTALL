@@ -1,0 +1,10 @@
+To install mpcrouter on your computer, first install all the runtime dependencies:
+$ sudo apt-get install libnss3-tools mkcert ruby-rubygems rubygems-integration ruby-rack ruby-sinatra ruby-sinatra-contrib puma ruby-rack-ssl
+$ sudo gem install ruby-dbus
+$ sudo make install
+
+Building Debian Packages
+==============
+To build a debian package, first install all build dependencies, then make the deb-pkg target:
+$ sudo apt-get install dh-make devscripts
+$ sudo make deb-pkg

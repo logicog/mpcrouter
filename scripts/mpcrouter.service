@@ -1,0 +1,12 @@
+[Unit]
+Description=MPC Routing Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/puma --debug --dir /usr/share/mpcrouter -C /usr/share/mpcrouter/puma.rb
+Restart=on-failure
+EnvironmentFile=/etc/default/mpcrouter
+
+[Install]
+WantedBy=multi-user.target
+

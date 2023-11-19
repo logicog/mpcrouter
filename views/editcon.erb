@@ -1,0 +1,339 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+  <body>
+    <% connection = @con_settings["connection"]
+       p connection
+       ipv4 = @con_settings["ipv4"]
+       p "GOT IPV4 #{ipv4}"
+       u = Time.now.to_i - connection["timestamp"].to_i 
+       l = Time.at(u)
+       uptime = sprintf("%d:%02d:%02d", l.hour, l.min, l.sec)
+       pppuser = ""
+       ppppass = ""
+       vlan = ""
+       if connection["type"].eql? "pppoe" then
+	  iphidden = "d-none"
+	  autohidden = "d-none"
+	  currentConMethod4 = "PPP over Ethernet"
+	  pppuser = @con_settings["pppoe"]["username"]
+	  ppppass = @con_settings["pppoe"]["password"]
+	  parent = @con_settings["pppoe"]["parent"]
+	  puts "parent: #{parent}"
+	  p parent
+	  p parent.split(/\./)
+	  if parent and parent.split(/\./).size == 2 then
+	    puts "In here"
+	    p parent.split(/\./)[1]
+	    vlan = parent.split(/\./)[1].to_i
+	  end
+       elsif ipv4["method"].eql? "auto" then
+	  iphidden = "d-none"
+	  autohidden = "d-none"
+	  ppphidden = "d-none"
+	  currentConMethod4 = "DHCP Client"
+       elsif ipv4["method"].eql? "manual"
+	  ipaddress = ipv4["address-data"][0]["address"]
+	  gateway = ipv4["gateway"]
+	  currentConMethod4 = "Static IP Address"
+	  statichidden = "d-none"
+	  ppphidden = "d-none"
+	  autohidden = ""
+       end
+       if "WAN".eql? connection["id"] then
+	  wanhidden = "hidden"
+	  wannone = "d-none"
+	  lannone = ""
+	  upstream = " upstream "
+       else
+	  zone = "lan"
+	  upstream = ""
+	  lannone = "d-none"
+	  gateway = ""
+       end
+       ipv6address = ""
+       dhcphostname = ""
+       dns1val = ""
+       dns2val = ""
+       dns1val = ipv4["dns-data"][0] if ipv4["dns-data"] and ipv4["dns-data"].size > 0
+       dns2val = ipv4["dns-data"][1] if ipv4["dns-data"] and ipv4["dns-data"].size > 1
+       dhcphostname = ipv4["dhcp-client-id"]
+       if @nextStep.eql? "return"
+         endButtonText = "Done"
+         nextStep = "none"
+       else
+	 endButtonText = "Next"
+	 nextStep = "nextinterface"
+       end
+       puts "nextStep #{@nextStep} endButtonText #{endButtonText}, nextStep #{nextStep}"
+       %>
+      
+    <div class = "container mt-3">
+    <h2>Connection settings for Connection <%=connection["id"]%> on <%= @name %></h2>
+    <p> Uptime: <%= uptime %></p>
+
+      <div class="row">
+	<div class="column">
+	  <label for="inputMethod" class="col-form-label">Method</label>
+	</div>
+	<div class="column">
+	  <div class="dropdown">
+	    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	      Change Protocol (currently <%=currentConMethod4%>)
+	    </button>
+	    <ul class="dropdown-menu pb-4" aria-labelledby="dropdownMenuButton1">
+	      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalDHCP">DHCP Client</a></li>
+	      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalStatic">Static IP address</a></li>
+	      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPPP">PPP</a></li>
+	    </ul>
+	  </div>
+	</div>  
+	<div class="column">
+	  <span id="ipaddressHelpInline" class="form-text">
+	    The Protocol and connection method used.
+	  </span>
+	</div>
+      </div>
+    
+    <form action="/setconnection" method="post" id="editform">
+
+      <div class="row g-3 align-items-center">
+	<div class="col-auto">
+	  <label for="inputDevice" class="col-form-label">Device</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <select class="form-select" name="device">
+	    <% @etherdevs.each do |d_name| %>
+	      <option maxlength="10" pattern="^([\w\d\.]+)$" value="<%=d_name%>"> <%=d_name%> </option>
+	    <% end %>
+	  </select>
+	</div>
+      </div> 
+      
+      <div class="col-auto">
+	<span id="ipaddressHelpInline" class="form-text">
+	  Which physical device to use for this connection.
+	</span>
+      
+      <div class="row g-3 align-items-center <%=ppphidden%>">
+	<div class="col-auto">
+	  <label for="inputPPPUser" class="col-form-label">PPPoE Username</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="text" maxlength="32" class="form-control" aria-describedby="PPPUserHelpInline" name="pppuser" value="<%=pppuser%>">
+	</div>
+	<div class="col-auto">
+	  <span id="PPPUserHelpInline" class="form-text">
+	    Username used to authenticate against the PPP server.
+	  </span>
+	</div>
+      </div>
+    </div> 
+    
+      <div class="row g-3 align-items-center <%=ppphidden%>">
+	<div class="col-auto">
+	  <label for="inputPPPPass" class="col-form-label">PPPoE Password</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="text" maxlength="32" class="form-control" aria-describedby="PPPPassHelpInline" name="ppppass" value="<%=ppppass%>">
+	</div>
+	<div class="col-auto">
+	  <span id="PPPPassHelpInline" class="form-text">
+	    Password used to authenticate against the PPP server.
+	  </span>
+	</div>
+      </div>
+      
+      <div class="row g-3 align-items-center  <%=autohidden%>">
+	<div class="col-auto">
+	  <label for="inputIPAddress" class="col-form-label  <%=autohidden%>">IP-Address</label>
+	</div>
+	<div class="col-auto pb-2 pt-2  <%=autohidden%>">
+	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="ipaddressHelpInline" name="ip4address" value="<%=ipaddress%>">
+	</div>
+	<div class="col-auto  <%=autohidden%>">
+	  <span id="ipaddressHelpInline" class="form-text">
+	    The interface's IP address.
+	  </span>
+	</div>
+      </div>
+      
+      <div class="row g-3 align-items-center <%=iphidden%>">
+	<div class="col-auto">
+	  <label for="inputNetmask" class="col-form-label">Netmask</label>
+	</div>
+	<div class="col-auto pb-2 pt-2 <%=iphidden%>">
+	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="netmaskHelpInline" name="netmask" value="255.255.255.0">
+	</div>
+	<div class="col-auto <%=iphidden%>">
+	  <span id="netmaskHelpInline" class="form-text">
+	    The network mask ( /24 = 255.255.255.0, /16 = 255.255.0.0, ...)
+	  </span>
+	</div>
+      </div>
+
+      <div class="row g-3 align-items-center <%=lannone%>">
+	<div class="col-auto">
+	  <label for="inputGateway" class="col-form-label">Gateway</label>
+	</div>
+	<div class="col-auto pb-2 pt-2 <%=iphidden%>">
+	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="gatewayHelpInline" name="gateway" value="<%=gateway%>">
+	</div>
+	<div class="col-auto <%=iphidden%>">
+	  <span id="gatewayHelpInline" class="form-text">
+	    The interface's default gateway.
+	  </span>
+	</div>
+      </div>
+      
+      <div class="row g-3 align-items-center">
+	<div class="col-auto">
+	  <label for="inputDNS" class="col-form-label">DNS Servers</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="DNSHelpInline" name="DNS1" value="<%=dns1val%>">
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="DNSHelpInline" name="DNS2" value="<%=dns2val%>">
+	</div>
+	<div class="col-auto">
+	  <span id="DNSHelpInline" class="form-text">
+	    Additional <%=upstream%> DNS servers.
+	  </span>
+	</div>
+      </div>
+      
+      <div class="row g-3 align-items-center <%=wannone%>">
+	<div class="col-auto">
+	  <label for="inputZone" class="col-form-label">DNS search domain</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="text" maxlength="15" class="form-control" aria-describedby="zoneHelpInline" name="searchzone" value="<%=zone%>">
+	</div>
+	<div class="col-auto">
+	  <span id="zoneHelpInline" class="form-text">
+	    The name of the local area network to be appended automaticall for DNS searches. Often "lan", optional, but recommended.
+	  </span>
+	</div>
+      </div>
+      
+      <div class="row g-3 align-items-center <%=statichidden%>">
+	<div class="col-auto">
+	  <label for="inputDHCPHostname" class="col-form-label">Hostname sent to DHCP server</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="text" maxlength="32" class="form-control" aria-describedby="DHCPHostnameHelpInline" name="dhcphostname" value="<%=dhcphostname%>">
+	</div>
+	<div class="col-auto">
+	  <span id="DHCPHostnameHelpInline" class="form-text">
+	    Use this hostname to send to the DHCP server instead of the actual hostname (optional).
+	  </span>
+	</div>
+      </div>
+     
+      <div class="row g-3 align-items-center <%=iphidden%>">
+	<div class="col-auto">
+	  <label for="inputIPv6Address" class="col-form-label">IPv6 Address</label>
+	</div>
+	<div class="col-auto pb-2 pt-2 <%=iphidden%>">
+	  <input type="text" class="form-control" aria-describedby="ipv6addressHelpInline" name="ipv6adress" value="<%=ipv6address%>">
+	  <!-- input type="text" pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$" class="form-control" aria-describedby="ipv6addressHelpInline" name="ipv6adress" value="<%=ipv6address%>" -->
+	</div>
+	<div class="col-auto <%=iphidden%>">
+	  <span id="ipv6addressHelpInline" class="form-text">
+	    The interface's IPv6 address.
+	  </span>
+	</div>
+      </div>
+
+      <div class="row g-3 align-items-center <%=ppphidden%>">
+	<div class="col-auto">
+	  <label for="inputVLAN" class="col-form-label">VLAN</label>
+	</div>
+	<div class="col-auto pb-2 pt-2">
+	  <input type="number" minlength="0" maxlength="4" size="4" class="form-control" aria-describedby="vlanHelpInline" name="vlan" value="<%=vlan%>">
+	</div>
+	<div class="col-auto">
+	  <span id="vlanHelpInline" class="form-text">
+	    VLAN used for upstream data transfer
+	  </span>
+	</div>
+      </div>
+
+      <input type="hidden" name="ipv4method" value="<%=ipv4["method"]%>" >
+      <input type="hidden" name="connection" value="<%=connection["id"]%>" >
+      <input type="hidden" name="next" value="<%=nextStep%>" >
+    </form>
+
+    <div class="container ms-3">
+      <form action="/setup" method="get" id="resetform">
+	<input type="hidden" name="interface" value="bla" >
+      </form>
+      <button form="resetform" class="btn btn-outline-primary">Reset</button>
+      <button form="editform" class="btn btn-primary me-2"><%=endButtonText%></button>
+    </div>
+
+  </div> <!-- container -->
+
+  
+    <div class="modal" tabindex="-1" id="modalDHCP">
+      <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+	    <h5 class="modal-title">Really change protocol?</h5>
+	    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	  </div>
+	  <div class="modal-body">
+	    <h2 class="modal-title">Are you sure you want to switch to configure the interface using DHCP?</h2>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+	    <a class="btn btn-primary" href="/setupif?interface=<%=connection["id"]%>&method=auto" role="button">YES</a>
+	  </div>
+	</div>
+      </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="modalStatic">
+      <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+	    <h5 class="modal-title">Really change protocol?</h5>
+	    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	  </div>
+	  <div class="modal-body">
+	    <h2 class="modal-title">Are you sure you want to switch to configure the interface manually with a Static IP Address?</h2>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+	    <a class="btn btn-primary" href="/setupif?interface=<%=connection["id"]%>&method=manual" role="button">YES</a>
+	  </div>
+	</div>
+      </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="modalPPP">
+      <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+	    <h5 class="modal-title">Really change protocol?</h5>
+	    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	  </div>
+	  <div class="modal-body">
+	    <h2 class="modal-title">Are you sure you want to switch to configure the interface using PPP?</h2>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+	    <a class="btn btn-primary" href="/setupif?interface=<%=connection["id"]%>&method=pppoe" role="button">YES</a>
+	  </div>
+	</div>
+      </div>
+    </div>
+    
+        
+    <script src="bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>
+

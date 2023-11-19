@@ -1,0 +1,24 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+  <body>
+    <form action="/authenticate" method="post" >
+      <div class="container-sm mt-3">
+      <h2>Login to MCPRouter on <%=@name%></h2>
+      <div class="flex-row mb-3 mt-3" size="20%">
+	<label for="exampleInputEmail1" class="form-label">Username</label>
+	<input type="text" name="login" class="form-control" id="exampleInputEmail1" aria-describedby="userHelp" value="root">
+	<div id="userHelp" class="form-text">Use any local user account or the root account.</div>
+      </div>
+      <div class="flex-row mb-3" size="20%">
+	<label for="exampleInputPassword1" class="form-label">Password</label>
+	<input type="password" name="password" class="form-control" id="exampleInputPassword1">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+    <script src="bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>

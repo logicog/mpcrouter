@@ -1,0 +1,21 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+  <body>
+    <form>
+      <div class="container-sm mt-3">
+        <h2>Setup of <%=@name%> done</h2>
+        <p>Errors encountered: </p>
+          <ul>
+          <% @errors.each do |e| %>
+            <li><%=e%></li>
+          <% end %>
+          </ul>
+        <a class="btn btn-primary" href="/" role="button">Back to overview.</a>
+      </div>
+    </form>
+    <script src="bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>

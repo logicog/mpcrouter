@@ -1,0 +1,60 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+  <body>
+    <% public_ip = "193.209.225.84"
+       %>
+      
+    <div class = "container mb-4"> <h2>Firewall configuration</h2> </div>
+      <div class = "container">
+      
+	<h3>Port Forwarding Rules </h3>
+	<table class="table table-hover table-striped" style="width: 90%; margin-left: auto; margin-right: auto;">
+	    <tr>
+		<th>Rule-Name</th>
+		<th>Protocol</th>
+		<th>Router Port</th>
+		<th>Target Host</th>
+		<th>Target Port</th>
+		<th>Actions</th>
+	    </tr>
+	<% @port_forwards.each_with_index do |pf, i| %>
+	    <tr>
+	    <td><%= pf[:rule] %></td>
+	    <td><%= pf[:protocol] %></td>
+	    <td><%= pf[:dport] %></td>
+	    <td><%= pf[:host] %></td>
+	    <td><%= pf[:port] %></td>
+	    <td> <a class="btn btn-primary" href="/nftables?delete=<%=i%>" role="button">Delete</a></td>
+	    </tr>
+	<% end %>
+	    <form action="/nftablesadd" method="post" id="editform">
+	    <tr> 
+	      <th><input type="text" maxlength="32" class="form-control" name="rule"></th>
+	      
+	      <th>
+		<select class="form-select" name="protocol">
+		    <option maxlength="3" value="tcp"> tcp </option>
+		    <option maxlength="3" value="udp"> udp </option>
+		</select>
+	      </th>
+
+	      <th><input type="number" maxlength="5" class="form-control" name="dport"></th>
+	      <th><input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" name="host" </th>
+	      <th><input type="bumber" maxlength="5" class="form-control" name="port"></th>
+	    <td> <button form="editform" class="btn btn-primary me-2">Add</button> </td>
+	    </tr>
+	    </form>
+	</table>
+      </div> <!-- container -->
+    </form>
+
+    <div class="container ms-3">
+      <a class="btn btn-outline-primary" href="/nftablesreset" role="button">Reset</a>
+      <a class="btn btn-primary" href="/nftablessave" role="button">Save</a>
+    </div>
+    <script src="bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>

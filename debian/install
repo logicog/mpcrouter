@@ -1,0 +1,12 @@
+puma.rb usr/share/mpcrouter
+config.ru usr/share/mpcrouter
+dnsmasq_rw.rb usr/share/mpcrouter
+nftables_rw.rb usr/share/mpcrouter
+mpcrouter.rb usr/share/mpcrouter
+public/*.js usr/share/mpcrouter/public/
+public/*.css usr/share/mpcrouter/public/
+views/*.erb usr/share/mpcrouter/views/
+scripts/mpcrouter etc/default/
+scripts/mpcrouter.service etc/systemd/system
+
+

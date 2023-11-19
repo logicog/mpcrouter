@@ -1,0 +1,105 @@
+<html>
+  <head>
+  <!-- <link rel="stylesheet" href="style.css">  -->
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+
+  <body>
+    <div class = "container mt-3">
+      <h2>Router Configuration</h2>
+      <a class="btn btn-primary mb-3" href="/setup" role="button">Setup Wizard</a>
+      <a class="btn btn-secondary mb-3" href="/dhcp" role="button">Configure DHCP</a>
+      <a class="btn btn-secondary mb-3" href="/nftables" role="button">Configure Firewall</a>
+      <h2>Active leases on <%= @name %></h2>
+      <table class="table table-hover table-striped" style="width: 90%; margin-left: auto; margin-right: auto;">
+	  <tr>
+	      <th>MAC</th>
+	      <th>Hostname</th>
+	      <th>IP</th>
+	      <th>Expires</th>
+	  </tr>
+      <% @leases.each do |lease| %>
+	  <tr>
+	  <td><%= lease["mac"] %></td>
+	  <td><%= lease["host"] %></td>
+	  <td><%= lease["ip"] %></td>
+	  <td><%= lease["expires"] %></td>
+	  </tr>
+      <% end %>
+      </table>
+
+    <h2>Network Status</h2>
+    <div class="row" style="width: 90%;">
+      <% @devices[0].each do |d_name|
+         device = @nm_service.object(d_name)
+         device_iface = device["org.freedesktop.NetworkManager.Device"]
+         if device_iface["DeviceType"] > 2 then
+           next
+         end %>
+      <% if device_iface["State"] == 100 then
+	   device_iface.define_method("GetAppliedConnection", "in flags:u")
+	   a_connection = device_iface.GetAppliedConnection(0)
+	   p "a_connection"
+	   p a_connection
+	   connection_method = a_connection[0]["ipv4"]["method"]
+	   color = "blue"
+	   p "BLUE"
+	   connection = a_connection[0]["connection"]
+	   uuid = connection["uuid"]
+	 else
+	   color = "gray"
+	   p "Gray"
+	   connection = {"id"=> "No Connection", "gateway" => "NA", "uuid" => "" }
+	   connection_method = "unknown"
+	   uuid = ""
+	 end %>
+	  <div class="col-sm-4"> <div class="card" style="width: 90%;  margin-left: auto; margin-right: auto; color:<%= color %>">
+           <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 512 512"><path fill="currentColor" d="M496 272v-32H272v-48h56a24.027 24.027 0 0 0 24-24V40a24.027 24.027 0 0 0-24-24H184a24.027 24.027 0 0 0-24 24v128a24.027 24.027 0 0 0 24 24h56v48H16v32h80v48H41.391a24.028 24.028 0 0 0-24 24v128a24.028 24.028 0 0 0 24 24H184a24.027 24.027 0 0 0 24-24V344a24.027 24.027 0 0 0-24-24h-56v-48h256v48h-56a24.027 24.027 0 0 0-24 24v128a24.027 24.027 0 0 0 24 24h144a24.027 24.027 0 0 0 24-24V344a24.027 24.027 0 0 0-24-24h-56v-48ZM192 48h128v112H192Zm-16 416H49.391V352H176Zm288 0H336V352h128Z"/></svg>
+	   <% ip4config = @nm_service.object(device_iface["Ip4Config"])
+	      ip4config_iface = ip4config["org.freedesktop.NetworkManager.IP4Config"]
+	      ipaddr = ip4config_iface["AddressData"][0]
+	      if ipaddr then
+		ipaddr = ipaddr["address"] + "/" + ipaddr["prefix"].to_s
+		gateway = ip4config_iface["Gateway"]
+	      else
+		ipaddr = "NULL"
+		gateway = "NA"
+	      end
+	      %>
+	   <%= connection["id"] %> [ <%= connection_method %> ]
+	   
+	   <div class="card-body">
+           <p> IP-Address: <%= ipaddr %></p>
+           <p> Gateway: <%= gateway %></p>
+           <p> MAC Address: <%= device_iface["HwAddress"] %></p>
+           <!-- device_iface["DeviceType"] -->
+           <p> Interface: <%= device_iface["Interface"] %> </p>
+           <% stat_iface = device["org.freedesktop.NetworkManager.Device.Statistics"] %>
+           <p> Received: <%= stat_iface["RxBytes"] %> B,  
+               Transmitted: <%= stat_iface["TxBytes"] %> B </p>
+           <div>
+           <form action="/stop_connection" method="post" id="stopform<%=uuid%>">
+	     <input type="hidden" name="interface" value="<%=uuid%>" >
+	   </form>
+           <form action="/restart_connection" method="post" id="restartform<%=uuid%>">
+	     <input type="hidden" name="interface" value="<%=uuid%>" >
+	   </form>
+           <form action="/edit_connection" method="post" id="editform<%=uuid%>">
+	     <input type="hidden" name="interface" value="<%=uuid%>" >
+	     <input type="hidden" name="next" value="none" >
+	   </form>
+	   <button form="stopform<%=uuid%>" class="btn btn-outline-danger">Stop</button>
+	   <button form="restartform<%=uuid%>" class="btn btn-outline-primary">Restart</button>
+	   <button form="editform<%=uuid%>" class="btn btn-primary me-2">Edit</button>
+	   </div>
+         </div>
+	 </div> </div>
+        <% end %>
+      </div>
+      
+    </div>
+      <!-- <script src="file:///usr/share/nodejs/popper.js/dist/popper.min.js"></script> -->
+      <script src="bootstrap.bundle.min.js"></script>
+  </body>
+</html>
+

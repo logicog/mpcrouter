@@ -1,0 +1,174 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+  <body>
+    <% dnsserver = "192.168.1.11"
+       referer = URI(request.referer)
+       puts "editdhcp: #{referer} #{referer.request_uri}"
+       if referer.request_uri.eql? "/" then
+         endButtonText = "Done"
+         nextStep = "none"
+       else
+	 endButtonText = "Next"
+	 nextStep = "commit"
+       end
+       %>
+      
+    <h1>DHCP and DNS configuration using dnsmasq</h1>
+
+    <form action="/setdhcp" method="post" id="editform">
+      <div class = "container">
+      
+	<div class="row g-3 align-items-center">
+	  <div class="col-auto">
+	    <label for="inputInterface" class="col-form-label">Listening interface</label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <select class="form-select" name="interface" describedby="interfaceHelpInline">
+	      <% @etherdevs.each do |d_name|
+	         puts d_name %>
+		<option maxlength="10" pattern="^([\w\d\.]+)$" value="<%=d_name%>"> <%=d_name%> </option>
+	      <% end %>
+	    </select>
+	  </div>
+	  <div class="col-auto">
+	    <span id="interfaceHelpInline" class="form-text">
+	      The interface the DNS client will be listening on, defaults to the LAN interface.
+	    </span>
+	  </div>
+	</div> 
+      
+	<div class="row g-3 align-items-center d-flex">
+	  <div class="col-auto m1-auto">
+	    <label for="inputDNS" class="col-form-label">DHCP Address Range</label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <div class="input-group" name="inputDHCPRange">
+	      <input type="text" class="form-control" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" describedby="DHCPRAngeHelpInline" id="inputDNS" name="dhcpminrange" value="<%=@dhcpmin%>">
+	      <span class="input-group-text">-</span>
+	      <input type="text" class="form-control" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" describedby="DHCPRAngeHelpInline" name="dhcpmaxrange" value="<%=@dhcpmax%>">
+	    </div>
+	  </div>
+	  <div class="col-auto">
+	    <span id="DHCPRAngeHelpInline" class="form-text">
+	      These addresses will be handed out to DHCP clients.
+	    </span>
+	  </div>
+	</div>
+      
+
+	<div class="row g-3 align-items-center">
+	  <div class="col-auto">
+	    <label for="inputEthers" class="col-form-label"> Use /etc/ethers file with MAC-Address Host mappings</label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <div class="form-check">
+	      <input class="form-check-input" type="checkbox" describedby="ethersHelpInline" name="ethersource" value="true" id="inputEthers">
+	    </div>
+	    <div class="col-auto">
+	      <span id="ethersHelpInline" class="form-text">
+		Which addresses will be handed out to DHCP clients.
+	      </span>
+	    </div>
+  <!--	    <label class="form-check-label" id="ethersHelpInline">
+		If checked, dnsmasq will be able to assign hostnames to devices based on their MAC-address.
+	      </label> -->
+	  </div>
+	</div>
+
+	<div class="row g-3 align-items-center" <%=@hideDNSSource%> >
+	  <div class="col-auto" <%=@hideDNSSource%>>
+	    <label for="inputDNSSource" class="col-form-label">Use Upstream DNS settings (from PPP): </label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <div class="form-check <%=@hideDNSSource%>">
+	      <input class="form-check-input" type="checkbox" describedby="dnssourceHelpInline" name="dnssource" value="true" id="inputDNSSource" <%=@hideDNSSource%>>
+	    </div>
+
+	    <div class="col-auto <%=@hideDNSSource%>">
+	      <span id="dnssourceHelpInline" class="form-text <%=@hideDNSSource%>">
+		If checked, dnsmasq will read /etc/ppp/resolv.conf for the configuration of DNS servers.
+	      </span>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="row g-3 align-items-center">
+	  <div class="col-auto">
+	    <label for="inputExpand" class="col-form-label">Expand all hosts with the local domain (<%=@dnssearch%>): </label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <div class="form-check">
+	      <input class="form-check-input" type="checkbox" describedby="expandHelpInline" name="expand" value="true" id="inputExpand" checked>
+	    </div>
+
+	  <div class="col-auto">
+	    <span id="expandHelpInline" class="form-text">
+	      If checked, dnsmasq will read /etc/ppp/resolv.conf for the configuration of DNS servers.
+	    </span>
+	  </div>
+	  </div>
+	</div>
+
+	<div class="row g-3 align-items-center">
+	  <div class="col-auto">
+	    <label for="inputDNSServer" class="col-form-label">DNS Server</label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="dnsserverHelpInline" id="inputDNSServer" name="dnsserver" value="<%=dnsserver%>">
+	  </div>
+	  <div class="col-auto">
+	    <span id="dnsserverHelpInline" class="form-text">
+	      IP address of an additional DNS server used to resolve addresses at the router.
+	    </span>
+	  </div>
+	</div>
+	
+	<div class="row g-3 align-items-center">
+	  <div class="col-auto">
+	    <label for="inputDNS4Advert" class="col-form-label">DNS Server Advertisment</label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	    <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="dns4advertHelpInline" id="inputDNS4Advert" name="dns4advert" value="<%=@lanaddress%>">
+	  </div>
+	  <div class="col-auto">
+	    <span id="dns4advertHelpInline" class="form-text">
+	      IP address of DNS server advertised by DHCP.
+	    </span>
+	  </div>
+	</div>
+	
+	<div class="row g-3 align-items-center">
+	  <div class="col-auto">
+	    <label for="inputDNS6Advert" class="col-form-label">DNS IPv6 Server Advertisment</label>
+	  </div>
+	  <div class="col-auto pb-2 pt-2">
+	  <!-- TODO: use correct IPv6 pattern -->
+	    <input type="text" minlength="7" maxlength="39" size="39" class="form-control" aria-describedby="dns6advertHelpInline" id="inputDNS6Advert" name="dns6advert" value="<%=@lan6address%>">
+	  </div>
+	  <div class="col-auto">
+	    <span id="dns6advertHelpInline" class="form-text">
+	      IPv6 address of DNS server advertised by DHCP.
+	    </span>
+	  </div>
+	</div>
+
+	<input type="hidden" name="next" value="<%=nextStep%>" >
+	<input type="hidden" name="local" value="<%=@dnssearch%>" >
+	<input type="hidden" name="domain" value="<%=@dnssearch%>" >
+
+      </div> <!-- container -->
+    </form>
+
+
+      <div class="container ms-3">
+	<form action="/dhcp" method="get" id="resetform">
+	  <button form="resetform" class="btn btn-outline-primary">Reset</button>
+	  <button form="editform" class="btn btn-primary me-2"><%=endButtonText%></button>
+	</form>
+      </div>
+    <script src="bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>

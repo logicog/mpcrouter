@@ -1,0 +1,26 @@
+<html>
+  <head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  </head>
+  <body>
+    <form>
+      <div class="container-sm mt-3">
+        <h2>Completing router setup on <%=@name%></h2>
+        <p>You are about to complete the setup. The following changes will be performed on your Computer:
+          <ul>
+            <li>The WAN connection is enabled on <%=@ifwan%>.</li>
+            <li>The LAN connection is enabled on <%=@iflan%>.</li>
+            <li>Routing between LAN and WAN is enabled.</li>
+            <li>A firewall is set up to protect the WAN interface <%=@ifwan%>.</li>
+            <li>The dnsmasq DHCP and DNS server is started.</li>
+            <li>The IPv6 router announcement server is started.</li>
+            <li>The sleep/hibernation modes of the device are disabled.</li>
+          </ul>
+      <button type="submit" class="btn btn-secondary">Abort</button>
+      <a class="btn btn-primary" href="/setup_complete" role="button">FINISH Setup</a>
+      </div>
+    </form>
+    <script src="bootstrap.bundle.min.js"></script>
+    
+  </body>
+</html>
