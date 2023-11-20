@@ -49,7 +49,35 @@ directory (--fix-broken merely makes sure all dependencies are installed, too):
 /tmp$ sudo apt install --fix-broken ./mpcrouter_0.1-1_all.deb
 ```
 
-# Usage
+# Configuration
+To configure the router, start a browser locally on that machine and connect via http or https to localhost:
 ![MPCRouter login](resources/login.png)
+In case you are using https, you will either need to make a security exception in the browser
+or follow the instructions here: [[https://github.com/FiloSottile/mkcert]] to install the certificates
+in the trust-store of the users browser. See the heading "Installing the CA on other systems" if you want
+to access the secure page from other devices on your LAN without making a security exception. The
+root-CA is installed by the installation scripts for the root user.
 
-![MPCRouter login](resources/main.png)
+You can then log in with any local user and password. On the main page you will be able to start the setup
+wizard:
+![MPCRouter login](resources/mainpage.png)
+
+Start the Wizard and you will first set up the WAN configuration:
+![MPCRouter login](resources/WANConfig.png)
+You can choose between a fixed WAN IP address, assignement via DHCP (typical Fibre to the home provider)
+and PPPoE (also with VLAN like for the DTAG), see below:
+![MPCRouter login](resources/WANPPPoE.png)
+
+In the next step, the LAN-Side of the router is configured. This is static IP configuration where you have
+to input the router's IP address and Network mask:
+![MPCRouter login](resources/LANConfig.png)
+
+In the next step, the DHCP server and DNS setup for the LAN-side can be configured:
+![MPCRouter login](resources/DHCPConfig.png)
+
+Note that until now no actual changes were performed on the router setup. An overview of the steps is given
+now that they will be commited:
+![MPCRouter login](resources/FinishSetup.png)
+
+At the end you will get an overview of what may have failed:
+![MPCRouter login](resources/SetupDone.png)

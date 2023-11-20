@@ -183,7 +183,7 @@ def createDefaultConnection(nm_settings_iface, connection, method)
   puts "createDefaultConnection, method: >#{method}<"
   if "auto".eql? method or method.eql? :auto then # FIXME, see below :auto used, need to be consistent!
       puts "Method: is auto: #{method}"
-      new_c = { "connection" => {"id" => connection, "type"=>"802-3-ethernet", "interface-name"=>"ppp1"}, "ipv4"=>{"method"=>"auto"}}
+      new_c = { "connection" => {"id" => connection, "type"=>"802-3-ethernet"}, "ipv4"=>{"method"=>"auto"}}
   elsif "manual".eql? method or method.eql? :manual then
       puts "Method: is manual: #{method}"
       new_c = {
@@ -202,7 +202,8 @@ def createDefaultConnection(nm_settings_iface, connection, method)
       new_c = {
         "connection" => {
           "id" => connection,
-          "type" => "pppoe"
+          "type" => "pppoe",
+	  "interface-name" => "ppp1"
         },
         "pppoe" => {
           "username" => "user",
@@ -274,16 +275,11 @@ end
 get '/setupif' do
     interface = params['interface']
     method = params['method']
-    p "Interface #{interface}, method: #{method}"
     @nm_service = bus.service("org.freedesktop.NetworkManager")
     init_nm
+    @name = @nm_settings_iface["Hostname"]
     if method
-      @name = @nm_settings_iface["Hostname"]
-      p "/setup Hostname: " + @name
-      @name = @nm_settings_iface["Hostname"]
       c, c_iface = getConnectionByName(interface)
-      p "GOT #{c}"
-      p "===================================================== DELETE ========================================== "
       c_iface.Delete() if c
       path = createDefaultConnection(@nm_settings_iface, interface, method)
     end

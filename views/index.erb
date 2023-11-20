@@ -74,9 +74,10 @@
            <p> MAC Address: <%= device_iface["HwAddress"] %></p>
            <!-- device_iface["DeviceType"] -->
            <p> Interface: <%= device_iface["Interface"] %> </p>
+
            <% stat_iface = device["org.freedesktop.NetworkManager.Device.Statistics"] %>
-           <p> Received: <%= stat_iface["RxBytes"] %> B,  
-               Transmitted: <%= stat_iface["TxBytes"] %> B </p>
+
+           <p> RX: <%= stat_iface["RxBytes"] %>B, TX: <%= stat_iface["TxBytes"] %>B </p>
            <div>
            <form action="/stop_connection" method="post" id="stopform<%=uuid%>">
 	     <input type="hidden" name="interface" value="<%=uuid%>" >

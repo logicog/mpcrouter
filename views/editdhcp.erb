@@ -20,11 +20,11 @@
     <form action="/setdhcp" method="post" id="editform">
       <div class = "container">
       
-	<div class="row g-3 align-items-center">
+	<div class="row g-3 mb-2 mt-2 align-items-center">
 	  <div class="col-auto">
 	    <label for="inputInterface" class="col-form-label">Listening interface</label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <select class="form-select" name="interface" describedby="interfaceHelpInline">
 	      <% @etherdevs.each do |d_name|
 	         puts d_name %>
@@ -39,11 +39,11 @@
 	  </div>
 	</div> 
       
-	<div class="row g-3 align-items-center d-flex">
+	<div class="row g-3 mb-2 mt-2 align-items-center d-flex">
 	  <div class="col-auto m1-auto">
 	    <label for="inputDNS" class="col-form-label">DHCP Address Range</label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <div class="input-group" name="inputDHCPRange">
 	      <input type="text" class="form-control" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" describedby="DHCPRAngeHelpInline" id="inputDNS" name="dhcpminrange" value="<%=@dhcpmin%>">
 	      <span class="input-group-text">-</span>
@@ -58,11 +58,11 @@
 	</div>
       
 
-	<div class="row g-3 align-items-center">
+	<div class="row g-3 mb-2 mt-2 align-items-center">
 	  <div class="col-auto">
 	    <label for="inputEthers" class="col-form-label"> Use /etc/ethers file with MAC-Address Host mappings</label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <div class="form-check">
 	      <input class="form-check-input" type="checkbox" describedby="ethersHelpInline" name="ethersource" value="true" id="inputEthers">
 	    </div>
@@ -77,11 +77,11 @@
 	  </div>
 	</div>
 
-	<div class="row g-3 align-items-center" <%=@hideDNSSource%> >
+	<div class="row g-3 mb-2 mt-2 align-items-center" <%=@hideDNSSource%> >
 	  <div class="col-auto" <%=@hideDNSSource%>>
 	    <label for="inputDNSSource" class="col-form-label">Use Upstream DNS settings (from PPP): </label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <div class="form-check <%=@hideDNSSource%>">
 	      <input class="form-check-input" type="checkbox" describedby="dnssourceHelpInline" name="dnssource" value="true" id="inputDNSSource" <%=@hideDNSSource%>>
 	    </div>
@@ -94,11 +94,11 @@
 	  </div>
 	</div>
 
-	<div class="row g-3 align-items-center">
+	<div class="row g-3 mb-2 mt-2 align-items-center">
 	  <div class="col-auto">
 	    <label for="inputExpand" class="col-form-label">Expand all hosts with the local domain (<%=@dnssearch%>): </label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <div class="form-check">
 	      <input class="form-check-input" type="checkbox" describedby="expandHelpInline" name="expand" value="true" id="inputExpand" checked>
 	    </div>
@@ -111,11 +111,11 @@
 	  </div>
 	</div>
 
-	<div class="row g-3 align-items-center">
+	<div class="row g-3 mb-2 mt-2 align-items-center">
 	  <div class="col-auto">
 	    <label for="inputDNSServer" class="col-form-label">DNS Server</label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="dnsserverHelpInline" id="inputDNSServer" name="dnsserver" value="<%=dnsserver%>">
 	  </div>
 	  <div class="col-auto">
@@ -125,11 +125,11 @@
 	  </div>
 	</div>
 	
-	<div class="row g-3 align-items-center">
+	<div class="row g-3 mb-2 mt-2 align-items-center">
 	  <div class="col-auto">
 	    <label for="inputDNS4Advert" class="col-form-label">DNS Server Advertisment</label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	    <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="dns4advertHelpInline" id="inputDNS4Advert" name="dns4advert" value="<%=@lanaddress%>">
 	  </div>
 	  <div class="col-auto">
@@ -139,11 +139,11 @@
 	  </div>
 	</div>
 	
-	<div class="row g-3 align-items-center">
+	<div class="row g-3 mb-2 mt-2 align-items-center">
 	  <div class="col-auto">
 	    <label for="inputDNS6Advert" class="col-form-label">DNS IPv6 Server Advertisment</label>
 	  </div>
-	  <div class="col-auto pb-2 pt-2">
+	  <div class="col-auto">
 	  <!-- TODO: use correct IPv6 pattern -->
 	    <input type="text" minlength="7" maxlength="39" size="39" class="form-control" aria-describedby="dns6advertHelpInline" id="inputDNS6Advert" name="dns6advert" value="<%=@lan6address%>">
 	  </div>

@@ -21,11 +21,8 @@
 	  ppppass = @con_settings["pppoe"]["password"]
 	  parent = @con_settings["pppoe"]["parent"]
 	  puts "parent: #{parent}"
-	  p parent
-	  p parent.split(/\./)
 	  if parent and parent.split(/\./).size == 2 then
-	    puts "In here"
-	    p parent.split(/\./)[1]
+	    puts "PPPoE with VLAN tag"
 	    vlan = parent.split(/\./)[1].to_i
 	  end
        elsif ipv4["method"].eql? "auto" then
@@ -73,11 +70,11 @@
     <h2>Connection settings for Connection <%=connection["id"]%> on <%= @name %></h2>
     <p> Uptime: <%= uptime %></p>
 
-      <div class="row">
-	<div class="column">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=lannone%>">
+	<div class="col-auto">
 	  <label for="inputMethod" class="col-form-label">Method</label>
 	</div>
-	<div class="column">
+	<div class="col-auto">
 	  <div class="dropdown">
 	    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 	      Change Protocol (currently <%=currentConMethod4%>)
@@ -89,7 +86,7 @@
 	    </ul>
 	  </div>
 	</div>  
-	<div class="column">
+	<div class="col-auto">
 	  <span id="ipaddressHelpInline" class="form-text">
 	    The Protocol and connection method used.
 	  </span>
@@ -98,29 +95,30 @@
     
     <form action="/setconnection" method="post" id="editform">
 
-      <div class="row g-3 align-items-center">
+      <div class="row g-3 align-items-center mb-2 mt-2">
 	<div class="col-auto">
 	  <label for="inputDevice" class="col-form-label">Device</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <select class="form-select" name="device">
 	    <% @etherdevs.each do |d_name| %>
 	      <option maxlength="10" pattern="^([\w\d\.]+)$" value="<%=d_name%>"> <%=d_name%> </option>
 	    <% end %>
 	  </select>
 	</div>
+	<div class="col-auto">
+	  <span id="ipaddressHelpInline" class="form-text">
+	    Which physical device to use for this connection.
+	  </span>
+        </div> 
       </div> 
       
-      <div class="col-auto">
-	<span id="ipaddressHelpInline" class="form-text">
-	  Which physical device to use for this connection.
-	</span>
       
-      <div class="row g-3 align-items-center <%=ppphidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=ppphidden%>">
 	<div class="col-auto">
 	  <label for="inputPPPUser" class="col-form-label">PPPoE Username</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="text" maxlength="32" class="form-control" aria-describedby="PPPUserHelpInline" name="pppuser" value="<%=pppuser%>">
 	</div>
 	<div class="col-auto">
@@ -129,13 +127,12 @@
 	  </span>
 	</div>
       </div>
-    </div> 
     
-      <div class="row g-3 align-items-center <%=ppphidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=ppphidden%>">
 	<div class="col-auto">
 	  <label for="inputPPPPass" class="col-form-label">PPPoE Password</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="text" maxlength="32" class="form-control" aria-describedby="PPPPassHelpInline" name="ppppass" value="<%=ppppass%>">
 	</div>
 	<div class="col-auto">
@@ -145,25 +142,25 @@
 	</div>
       </div>
       
-      <div class="row g-3 align-items-center  <%=autohidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=autohidden%>">
 	<div class="col-auto">
 	  <label for="inputIPAddress" class="col-form-label  <%=autohidden%>">IP-Address</label>
 	</div>
-	<div class="col-auto pb-2 pt-2  <%=autohidden%>">
+	<div class="col-auto  <%=autohidden%>">
 	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="ipaddressHelpInline" name="ip4address" value="<%=ipaddress%>">
 	</div>
-	<div class="col-auto  <%=autohidden%>">
+	<div class="col-auto <%=autohidden%>">
 	  <span id="ipaddressHelpInline" class="form-text">
 	    The interface's IP address.
 	  </span>
 	</div>
       </div>
       
-      <div class="row g-3 align-items-center <%=iphidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=iphidden%>">
 	<div class="col-auto">
 	  <label for="inputNetmask" class="col-form-label">Netmask</label>
 	</div>
-	<div class="col-auto pb-2 pt-2 <%=iphidden%>">
+	<div class="col-auto <%=iphidden%>">
 	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="netmaskHelpInline" name="netmask" value="255.255.255.0">
 	</div>
 	<div class="col-auto <%=iphidden%>">
@@ -173,11 +170,11 @@
 	</div>
       </div>
 
-      <div class="row g-3 align-items-center <%=lannone%>">
-	<div class="col-auto">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=lannone%>">
+	<div class="col-auto <%=iphidden%>">
 	  <label for="inputGateway" class="col-form-label">Gateway</label>
 	</div>
-	<div class="col-auto pb-2 pt-2 <%=iphidden%>">
+	<div class="col-auto <%=iphidden%>">
 	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="gatewayHelpInline" name="gateway" value="<%=gateway%>">
 	</div>
 	<div class="col-auto <%=iphidden%>">
@@ -187,14 +184,14 @@
 	</div>
       </div>
       
-      <div class="row g-3 align-items-center">
+      <div class="row g-3 align-items-center mb-2 mt-2">
 	<div class="col-auto">
 	  <label for="inputDNS" class="col-form-label">DNS Servers</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="DNSHelpInline" name="DNS1" value="<%=dns1val%>">
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="text" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" class="form-control" aria-describedby="DNSHelpInline" name="DNS2" value="<%=dns2val%>">
 	</div>
 	<div class="col-auto">
@@ -204,25 +201,25 @@
 	</div>
       </div>
       
-      <div class="row g-3 align-items-center <%=wannone%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=wannone%>">
 	<div class="col-auto">
 	  <label for="inputZone" class="col-form-label">DNS search domain</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="text" maxlength="15" class="form-control" aria-describedby="zoneHelpInline" name="searchzone" value="<%=zone%>">
 	</div>
 	<div class="col-auto">
 	  <span id="zoneHelpInline" class="form-text">
-	    The name of the local area network to be appended automaticall for DNS searches. Often "lan", optional, but recommended.
+	    The name of the local area network to be appended automaticall for DNS searches. Often "lan". Optional, but recommended.
 	  </span>
 	</div>
       </div>
       
-      <div class="row g-3 align-items-center <%=statichidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=statichidden%>">
 	<div class="col-auto">
 	  <label for="inputDHCPHostname" class="col-form-label">Hostname sent to DHCP server</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="text" maxlength="32" class="form-control" aria-describedby="DHCPHostnameHelpInline" name="dhcphostname" value="<%=dhcphostname%>">
 	</div>
 	<div class="col-auto">
@@ -232,11 +229,11 @@
 	</div>
       </div>
      
-      <div class="row g-3 align-items-center <%=iphidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=iphidden%>">
 	<div class="col-auto">
 	  <label for="inputIPv6Address" class="col-form-label">IPv6 Address</label>
 	</div>
-	<div class="col-auto pb-2 pt-2 <%=iphidden%>">
+	<div class="col-auto <%=iphidden%>">
 	  <input type="text" class="form-control" aria-describedby="ipv6addressHelpInline" name="ipv6adress" value="<%=ipv6address%>">
 	  <!-- input type="text" pattern="^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$" class="form-control" aria-describedby="ipv6addressHelpInline" name="ipv6adress" value="<%=ipv6address%>" -->
 	</div>
@@ -247,11 +244,11 @@
 	</div>
       </div>
 
-      <div class="row g-3 align-items-center <%=ppphidden%>">
+      <div class="row g-3 align-items-center mb-2 mt-2 <%=ppphidden%>">
 	<div class="col-auto">
 	  <label for="inputVLAN" class="col-form-label">VLAN</label>
 	</div>
-	<div class="col-auto pb-2 pt-2">
+	<div class="col-auto">
 	  <input type="number" minlength="0" maxlength="4" size="4" class="form-control" aria-describedby="vlanHelpInline" name="vlan" value="<%=vlan%>">
 	</div>
 	<div class="col-auto">
