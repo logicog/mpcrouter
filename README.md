@@ -60,24 +60,30 @@ root-CA is installed by the installation scripts for the root user.
 
 You can then log in with any local user and password. On the main page you will be able to start the setup
 wizard:
-![MPCRouter login](resources/mainpage.png)
+![MPCRouter mainpage](resources/mainpage.png)
 
 Start the Wizard and you will first set up the WAN configuration:
-![MPCRouter login](resources/WANConfig.png)
+![MPCRouter wanconfig](resources/WANConfig.png)
 You can choose between a fixed WAN IP address, assignement via DHCP (typical Fibre to the home provider)
 and PPPoE (also with VLAN like for the DTAG), see below:
-![MPCRouter login](resources/WANPPPoE.png)
+![MPCRouter wanpppoe](resources/WAN_PPPoE.png)
 
 In the next step, the LAN-Side of the router is configured. This is static IP configuration where you have
 to input the router's IP address and Network mask:
-![MPCRouter login](resources/LANConfig.png)
+![MPCRouter lanconfig](resources/LANConfig.png)
 
 In the next step, the DHCP server and DNS setup for the LAN-side can be configured:
-![MPCRouter login](resources/DHCPConfig.png)
+![MPCRouter dhcpconfig](resources/DHCPConfig.png)
 
 Note that until now no actual changes were performed on the router setup. An overview of the steps is given
 now that they will be commited:
-![MPCRouter login](resources/FinishSetup.png)
+![MPCRouter finishsetup](resources/FinishSetup.png)
 
 At the end you will get an overview of what may have failed:
-![MPCRouter login](resources/SetupDone.png)
+![MPCRouter setupdone](resources/SetupDone.png)
+
+# Firewall
+A firewall is automatically installed. By clicking the "Configure Firewall" button, additionally port forwarding
+can be configured:
+
+![MPCRouter firewall](resources/Firewall.png)
